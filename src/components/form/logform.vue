@@ -2,22 +2,24 @@
   <div class="log-form">
     <div class="log-form-group">
       <div class="form-style">
-        <label for="userId">用户名
-      <input type="text" name="" id="userId" value=""/>
+        <label for="userId">
+      <input type="text" name="" id="userId" value="" v-model="username" placeholder="用户名"/>
       </label>
+      
       </div>
       <div class="form-style">
-        <label for="psw">密码
-      <input type="password" name="" id="psw" value=""/>
+        <label for="psw">
+      <input type="password" name="" id="psw" value="" v-model="userpwd" placeholder="密码"/>
       </label>
       </div>
+      <div class="error">{{userError.errorText}}</div>
       <div class="form-save-style">
         <label for="save" class="ckbox">
         <input  type="checkbox" name="" id="save" value=""/>保存密码
         </label>
         <a href="">忘记密码</a>
       </div>
-      <input type="submit" name="" id="sbt" value="登录" />
+      <input type="submit" name="" id="sbt" value="登录" @click="onLogin"/>
     </div>
   </div>
 </template>
@@ -27,6 +29,43 @@
 export default {
   data () {
     return {
+      username: '',
+      userpwd: ''
+    }
+  },
+  computed: {
+    userError () {
+      let errorText, status
+      if (!/@/g.test(this.username)) {
+        status = false
+        errorText = '你输入的账号错误'
+      } else {
+        status = true
+        errorText = ''
+      }
+      if (!this.errorFlag) {
+        errorText = ''
+        this.errorFlag = true
+      }
+      return {
+        errorText,
+        status
+      }
+    }
+  },
+  methods: {
+    onLogin () {
+      if (!this.userError.status) {
+        alert('账号信息错误')
+      } else {
+        this.errorText = ''
+        this.$http.get('api/login')
+        .then((res) => {
+          this.$emit('has-log', res.data)
+        }, (error) => {
+          console.log(error)
+        })
+      }
     }
   }
 }
@@ -48,6 +87,8 @@ export default {
   background: rgba(255,255,255,0);
   border:none;
   border:#666 1px solid;
+  padding: 8px;
+  width:100%;
 }
 
 .form-style label{
@@ -71,6 +112,7 @@ export default {
   width: 16px;
   height: 16px;
   vertical-align: middle;
+
 }
 .ckbox{
   font-size: 14px;
@@ -82,5 +124,10 @@ export default {
 }
 #sbt:hover{
   border:1px solid #999;
+}
+.error{
+  margin: auto;
+  color:red;
+  font-size: 14px;
 }
 </style>

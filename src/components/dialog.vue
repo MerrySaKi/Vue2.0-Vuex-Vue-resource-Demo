@@ -1,14 +1,18 @@
 <template>
-  <div class="dialog" v-if = "isShow">
-    <div class="dialog-cover" @click= "closeShow"></div>
-    <div class="dialog-warp">
-      <div @click= "closeShow" class="close">
-        <div class="dialog-close" ></div>
+  <div>
+    <div class="dialog">
+    <div class="dialog-cover" @click="closeShow" v-if="isShow"></div>
+    <transition name="drop">
+      <div class="dialog-warp" v-if="isShow">
+        <div @click="closeShow" class="close">
+          <div class="dialog-close"></div>
+        </div>
+        <div class="dialog-content">
+          <slot>empty</slot>
+        </div>
       </div>
-      <div class="dialog-content">
-        <slot>empty</slot>
-      </div>
-    </div>
+    </transition>
+  </div>
   </div>
 </template>
 <script>
@@ -34,6 +38,18 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.drop-enter-active {
+  transition: all .5s ease;
+}
+.drop-leave-active {
+  transition: all .5s ease;
+}
+.drop-enter {
+  transform: translateY(-500px);
+}
+.drop-leave-active {
+  transform: translateY(-500px);
+}
 *{
   padding: 0;
   margin: 0;
@@ -42,7 +58,6 @@ export default {
   width: 100%;
   height: 100%;
   position: fixed;
-  top:0;
 }
 .dialog-cover{
  position: fixed;
@@ -54,10 +69,10 @@ export default {
  background: rgba(0,0,0,0.5);
 }
 .dialog-warp{
- width: 30%;
+ width: 500px;
  position: fixed;
  left: 50%;
- margin-left:-15%;
+ margin-left:-250px;
  top:20%;
  background: rgba(255,255,255,0.9);
  z-index: 10;
