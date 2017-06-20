@@ -33,6 +33,12 @@ export default {
       } else {
         this.nowIndex.splice(this.nowIndex.indexOf(index), 1)
       }
+      // 给onchange返回映射的数组
+      let nowArray = []
+      this.nowIndex.map((item) => {
+        nowArray.push(this.mulChoose[item])
+      })
+      this.$emit('on-change', nowArray)
     },
     checkActive (index) {
       return this.nowIndex.indexOf(index) !== -1

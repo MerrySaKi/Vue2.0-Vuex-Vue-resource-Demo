@@ -10,7 +10,7 @@
           购买数量:
         </div>
         <div class="sale-board-from-line-right">
-          123
+          <v-counter></v-counter>
         </div>
       </div>
       <div class="sale-board-from-line">
@@ -252,10 +252,13 @@
 <script>
 import vSelection from '../../components/selection'
 import vMulChooser from '../../components/mulchooser'
+import vCounter from '../../components/counter'
+
 export default {
   components: {
     vSelection,
-    vMulChooser
+    vMulChooser,
+    vCounter
   },
   data () {
     return {

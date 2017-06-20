@@ -38,7 +38,7 @@ export default {
     changeIndex (index) {
       this.nowIndex = index
       this.selectonShow = false
-      this.$emit('on-change', this.nowIndex)
+      this.$emit('on-change', this.selections[this.nowIndex])
     }
   }
 }

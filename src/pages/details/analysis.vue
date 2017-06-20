@@ -10,7 +10,7 @@
           购买数量:
         </div>
         <div class="sale-board-from-line-right">
-          1
+          <v-counter @on-change="onParamChange('buyNum', $event)"></v-counter>
         </div>
       </div>
       <div class="sale-board-from-line">
@@ -18,7 +18,10 @@
           产品类型:
         </div>
         <div class="sale-board-from-line-right">
-          <v-selection :selections="buyTypes"></v-selection>
+          <v-selection 
+            :selections="buyTypes"
+            @on-change="onParamChange('buyType', $event)"
+          ></v-selection>
         </div>
       </div>
       <div class="sale-board-from-line">
@@ -26,7 +29,10 @@
           有效时间:
         </div>
         <div class="sale-board-from-line-right">
-          <v-chooser :choosers= "periodList"></v-chooser>
+          <v-chooser 
+            :choosers= "periodList"
+            @on-change="onParamChange('period', $event)"
+          ></v-chooser>
         </div>
       </div>
       <div class="sale-board-from-line">
@@ -34,7 +40,7 @@
           产品版本:
         </div>
         <div class="sale-board-from-line-right">
-          <v-chooser :choosers="versionList"></v-chooser>
+           <v-mul-chooser :mulChoose = "versionList" @on-change="onParamChange('versions', $event)"></v-mul-chooser>
         </div>
       </div>
       <div class="sale-board-from-line">
@@ -42,7 +48,7 @@
           总价:
         </div>
         <div class="sale-board-from-line-right">
-          15元
+          {{price}}元
         </div>
       </div>
       <div class="sale-board-from-line">
@@ -81,13 +87,22 @@
 <script>
 import vSelection from '../../components/selection'
 import vChooser from '../../components/chooser'
+import vCounter from '../../components/counter'
+import vMulChooser from '../../components/mulchooser'
 export default {
   components: {
     vSelection,
-    vChooser
+    vChooser,
+    vCounter,
+    vMulChooser
   },
   data () {
     return {
+      buyNum: 0,
+      buyType: {},
+      versions: [],
+      period: {},
+      price: 0,
       versionList: [
         {
           label: '客户版',
@@ -130,6 +145,28 @@ export default {
           value: 2
         }
       ]
+    }
+  },
+  methods: {
+    onParamChange (attr, val) {
+      this[attr] = val
+      this.getPrice()
+    },
+    getPrice () {
+      let buyVersionsArray = []
+      this.versions.map((item) => {
+        buyVersionsArray.push(item.value)
+      })
+      let reqParams = {
+        buyNumber: this.buyNum,
+        buyType: this.buyType.value,
+        period: this.period.value,
+        version: buyVersionsArray.join(',')
+      }
+      this.$http.get('/api/getPrice', reqParams)
+      .then((res) => {
+        this.price = res.data.amount
+      })
     }
   }
 }
