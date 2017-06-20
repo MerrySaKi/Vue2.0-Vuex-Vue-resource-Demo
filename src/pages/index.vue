@@ -10,10 +10,18 @@ export default {
     return {
     }
   }
+  }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-
+<style>
+@import url("../../css/normalize.css");
+html,body{
+  padding: 0;
+  margin: 0;
+}
+.app-content{
+  margin: 50px 0;
+}
 </style>

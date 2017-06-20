@@ -60,10 +60,10 @@ export default {
         pc: {
           title: 'PC产品',
           list: [
-            {name: '数据统计', url: '1'},
-            {name: '数据预测', url: '2', hot: true},
-            {name: '流量分析', url: '3'},
-            {name: '广告发布', url: '4'}
+            {name: '数据统计', url: '/detail/count'},
+            {name: '数据预测', url: '/detail/forecast', hot: true},
+            {name: '流量分析', url: '/detail/analysis'},
+            {name: '广告发布', url: '/detail/publish'}
           ]
         },
         app: {
@@ -90,7 +90,7 @@ export default {
         {
           src: require('../assets/slideShow/1.jpg'),
           title: 'xxx1',
-          href: 'detal/1'
+          href: 'detail/1'
         },
         {
           src: require('../assets/slideShow/2.jpg'),

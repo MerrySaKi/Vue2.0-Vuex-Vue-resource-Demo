@@ -1,7 +1,9 @@
 <template>
   <div id="app">
     <div class="app-header">
-      <img src="assets/logo.png" alt="" />
+      <router-link :to="{path:'/'}">
+        <img :src = "logo"/>
+      </router-link>
       <ul>
         <li>{{username}}</li>
         <li v-if="username!==''" @click="logout">退出</li> 
@@ -48,7 +50,8 @@ export default {
       showLogShow: false,
       showRegShow: false,
       showAboutShow: false,
-      username: ''
+      username: '',
+      logo: require('./assets/logo.png')
     }
   },
   components: {
@@ -87,7 +90,7 @@ html,body{
   padding: 0;
   margin: 0;
   background: rgb(240,242,242);
-  overflow: hidden;
+  font-family: "microsoft yahei";
 }
 .app-header{
   width:100%;
