@@ -69,12 +69,13 @@ export default {
  background: rgba(0,0,0,0.5);
 }
 .dialog-warp{
- width: 500px;
+ width: 50%;
  position: fixed;
  left: 50%;
- margin-left:-250px;
+ margin-left:-25%;
  top:20%;
- background: rgba(255,255,255,0.9);
+ overflow: auto;
+ background: rgba(255,255,255,1);
  z-index: 10;
 }
 .close{
@@ -107,7 +108,7 @@ export default {
   left: -1px;
 }
 .dialog-content{
-  padding:50px 0;
-  overflow: auto;
+  padding:25px 15px;
+  overflow: hidden;
 }
 </style>

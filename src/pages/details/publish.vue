@@ -10,7 +10,7 @@
           购买数量:
         </div>
         <div class="sale-board-from-line-right">
-          <v-counter></v-counter>
+          <v-counter @on-change="onParamChange('buyNum', $event)"></v-counter>
         </div>
       </div>
       <div class="sale-board-from-line">
@@ -18,7 +18,7 @@
           产品类型:
         </div>
         <div class="sale-board-from-line-right">
-          <v-selection :selections="versionList"></v-selection>
+          <v-selection :selections="versionList" @on-change="onParamChange('buyType', $event)"></v-selection>
         </div>
       </div>
       <div class="sale-board-from-line">
@@ -34,7 +34,7 @@
           产品版本:
         </div>
         <div class="sale-board-from-line-right">
-           <v-mul-chooser :mulChoose = "tradeList"></v-mul-chooser>
+           <v-mul-chooser :mulChoose = "tradeList" @on-change="onParamChange('versions', $event)"></v-mul-chooser>
         </div>
       </div>
       <div class="sale-board-from-line">
@@ -42,7 +42,7 @@
           总价:
         </div>
         <div class="sale-board-from-line-right">
-         52元
+         {{price * buyNum}}元
         </div>
       </div>
       <div class="sale-board-from-line">
@@ -250,9 +250,9 @@
 </template>
 
 <script>
-import vSelection from '../../components/selection'
-import vMulChooser from '../../components/mulchooser'
-import vCounter from '../../components/counter'
+import vSelection from '../../components/base/selection'
+import vMulChooser from '../../components/base/mulchooser'
+import vCounter from '../../components/base/counter'
 
 export default {
   components: {
@@ -262,6 +262,10 @@ export default {
   },
   data () {
     return {
+      buyNum: 1,
+      buyType: {},
+      versions: [],
+      price: 0,
       tradeList: [
         {
           label: '出版业',
@@ -303,6 +307,33 @@ export default {
         }
       ]
     }
+  },
+  methods: {
+    onParamChange (attr, val) {
+      this[attr] = val
+      this.getPrice()
+    },
+    getPrice () {
+      let nowVersionArray = []
+      this.versions.map((item) => {
+        nowVersionArray.push(this.versions)
+      })
+      let regParam = {
+        buyNumber: this.buyNum,
+        buyTpye: this.buyType,
+        version: nowVersionArray.join(',')
+      }
+      this.$http.get('/api/getPrice', regParam)
+      .then((res) => {
+        this.price = res.data.amount
+      })
+    }
+  },
+  mounted () {
+    this.buyNum = 1
+    this.buyType = this.tradeList[0]
+    this.versions = [this.versionList[0]]
+    this.getPrice()
   }
 }
 </script>

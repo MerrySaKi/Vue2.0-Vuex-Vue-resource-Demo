@@ -9,7 +9,7 @@
           产品类型:
         </div>
         <div class="sale-board-from-line-right">
-          <v-chooser :choosers= "buyTypes"></v-chooser>
+          <v-chooser :choosers= "buyTypes" @on-change="onParamChange('buyType', $event)"></v-chooser>
         </div>
       </div>
       <div class="sale-board-from-line">
@@ -17,7 +17,7 @@
           适用地区:
         </div>
         <div class="sale-board-from-line-right">
-          <v-selection :selections="districts"></v-selection>
+          <v-selection :selections="districts"  @on-change="onParamChange('district', $event)"></v-selection>
         </div>
       </div>
       <div class="sale-board-from-line">
@@ -34,7 +34,7 @@
           总价:
         </div>
         <div class="sale-board-from-line-right">
-          15元
+          {{price}}元
         </div>
       </div>
       <div class="sale-board-from-line">
@@ -243,8 +243,8 @@
 </template>
 
 <script>
-import vSelection from '../../components/selection'
-import vChooser from '../../components/chooser'
+import vSelection from '../../components/base/selection'
+import vChooser from '../../components/base/chooser'
 export default {
   components: {
     vSelection,
@@ -252,6 +252,9 @@ export default {
   },
   data () {
     return {
+      buyType: {},
+      district: {},
+      price: 0,
       buyTypes: [
         {
           label: '红色版',
@@ -293,6 +296,27 @@ export default {
         }
       ]
     }
+  },
+  methods: {
+    onParamChange (attr, val) {
+      this[attr] = val
+      this.getPrice()
+    },
+    getPrice () {
+      let reqParams = {
+        buyType: this.buyType,
+        district: this.district
+      }
+      this.$http.get('/api/getPrice', reqParams)
+      .then((res) => {
+        this.price = res.data.amount
+      })
+    }
+  },
+  mounted () {
+    this.buyType = this.buyTypes[0]
+    this.district = this.districts[0]
+    this.getPrice()
   }
 }
 </script>

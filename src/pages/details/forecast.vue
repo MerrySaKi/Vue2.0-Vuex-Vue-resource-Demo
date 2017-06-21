@@ -9,7 +9,7 @@
           购买数量:
         </div>
         <div class="sale-board-from-line-right">
-          <v-counter></v-counter>
+          <v-counter :max=99 @on-change = "onParamChange('getNum', $event)"></v-counter>
         </div>
       </div>
       <div class="sale-board-from-line">
@@ -17,7 +17,7 @@
           媒介:
         </div>
         <div class="sale-board-from-line-right">
-          <v-mul-chooser :mulChoose="versionList"></v-mul-chooser>
+          <v-mul-chooser :mulChoose="versionList" @on-change = "onParamChange('versions', $event)"></v-mul-chooser>
         </div>
       </div>
       <div class="sale-board-from-line">
@@ -33,7 +33,7 @@
           总价:
         </div>
         <div class="sale-board-from-line-right">
-          15元
+          {{price * getNum}}元
         </div>
       </div>
       <div class="sale-board-from-line">
@@ -56,9 +56,9 @@
 </template>
 
 <script>
-import vSelection from '../../components/selection'
-import vMulChooser from '../../components/mulchooser'
-import vCounter from '../../components/counter'
+import vSelection from '../../components/base/selection'
+import vMulChooser from '../../components/base/mulchooser'
+import vCounter from '../../components/base/counter'
 export default {
   components: {
     vSelection,
@@ -67,6 +67,9 @@ export default {
   },
   data () {
     return {
+      getNum: 1,
+      versions: [],
+      price: 0,
       versionList: [
         {
           label: '纸质报告',
@@ -86,6 +89,31 @@ export default {
         }
       ]
     }
+  },
+  methods: {
+    onParamChange (attr, val) {
+      this[attr] = val
+      this.getPrice()
+    },
+    getPrice () {
+      let nowVersionArray = []
+      this.versions.map((item) => {
+        nowVersionArray.push(this.versions[item])
+      })
+      let regParam = {
+        version: nowVersionArray.join(','),
+        buyNumber: this.getNum
+      }
+      this.$http.get('/api/getPrice', regParam)
+      .then((res) => {
+        this.price = res.data.amount
+      })
+    }
+  },
+  mounted () {
+    this.getNum = 1
+    this.versions = [this.versionList[0]]
+    this.getPrice()
   }
 }
 </script>

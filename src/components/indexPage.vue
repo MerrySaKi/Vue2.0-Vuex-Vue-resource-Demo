@@ -33,7 +33,7 @@
             <div>
               <h3>{{sales.name}}</h3>
               <p>{{sales.context}}</p>
-              <button>立即购买</button>
+              <a :href="sales.href">立即购买</a>
             </div>
           </div>
         </template>
@@ -214,7 +214,7 @@ a:hover{
 .index-right .saleList div:nth-child(2){
   width: 60%;
 }
-.index-right .saleList button{
+.index-right .saleList a{
   border:none;
   outline: none;
   background-color:rgb(67,176,137);

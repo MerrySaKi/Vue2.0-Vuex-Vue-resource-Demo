@@ -40,7 +40,7 @@
 
 <script>
 import appFooter from './components/appfooter'
-import mydialog from './components/dialog'
+import mydialog from './components/base/dialog'
 import logForm from './components/form/logform'
 import regForm from './components/form/regform'
 
@@ -117,5 +117,12 @@ html,body{
   z-index: 10;
   line-height: 25px;
   font-weight: 300;
+}
+.v-btn{
+  display: inline-block;
+  padding: 5px 10px;
+  border:1px solid #4FC08D;
+  background: #4FC08D;
+  color:#fff;
 }
 </style>

@@ -32,7 +32,7 @@ export default {
       }
     },
     minus () {
-      if (this.number < this.min) {
+      if (this.number <= this.min) {
         return
       } else {
         this.number --
