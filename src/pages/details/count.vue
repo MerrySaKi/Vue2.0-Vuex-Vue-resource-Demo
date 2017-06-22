@@ -41,7 +41,7 @@
         <div class="sale-board-from-line-left">
         &nbsp;</div>
         <div class="sale-board-from-line-right">
-          <div class="sale-board-from-button">立即购买</div>
+          <div class="sale-board-from-button" @click="ShowPayDialog">立即购买</div>
         </div>
       </div>
     </div>
@@ -239,22 +239,57 @@
           </tbody>
       </table>
     </div>
+    <bank-dialog :is-show="isShowPayDialog" @on-close="hideShowPayDialog">
+        <div class="">
+        <table class="buy-dialog-list">
+          <tr>
+            <th>产品类型</th>
+            <th>地区</th>
+            <th>时间</th>
+          </tr>
+          <tr>
+            <td>{{buyType.label}}</td>
+            <td>{{district.label}}</td>
+            <td>半年</td>
+          </tr>
+        </table>
+        <h2>请选择银行</h2>
+        <bank-chooser @on-change="onChangeBanks"></bank-chooser>
+        <div class="buy-dialog-btn" @click="confirmBuy">确认购买</div>
+      </div>
+      </bank-dialog>
+      <bank-dialog :is-show="isShowErrDialog" @on-close="hideErrDialog">
+        支付失败！
+      </bank-dialog>
+      <check-order :is-show-check-dialog = "isShowCheckOrder" :order-id="orderId" @onCloseCheckDialog="hideCheckOrder"></check-order>
   </div>
 </template>
 
 <script>
 import vSelection from '../../components/base/selection'
 import vChooser from '../../components/base/chooser'
+import checkOrder from '../../components/checkorder'
+import bankChooser from '../../components/bankchoose'
+import bankDialog from '../../components/base/dialog'
+
 export default {
   components: {
     vSelection,
-    vChooser
+    vChooser,
+    bankDialog,
+    bankChooser,
+    checkOrder
   },
   data () {
     return {
       buyType: {},
       district: {},
       price: 0,
+      isShowPayDialog: false,
+      isShowCheckOrder: false,
+      isShowErrDialog: false,
+      orderId: null,
+      bankId: null,
       buyTypes: [
         {
           label: '红色版',
@@ -310,6 +345,37 @@ export default {
       this.$http.get('/api/getPrice', reqParams)
       .then((res) => {
         this.price = res.data.amount
+      })
+    },
+    ShowPayDialog () {
+      this.isShowPayDialog = true
+    },
+    hideShowPayDialog () {
+      this.isShowPayDialog = false
+    },
+    hideCheckOrder () {
+      this.isShowCheckOrder = false
+    },
+    hideErrDialog () {
+      this.isShowErrDialog = false
+    },
+    onChangeBanks (bankObj) {
+      this.bankId = bankObj.id
+    },
+    confirmBuy () {
+      let reqParams = {
+        buyType: this.buyType.value,
+        district: this.district.label,
+        bankId: this.bankId
+      }
+      this.$http.get('/api/createOrder', reqParams)
+      .then((res) => {
+        this.orderId = res.data.orderId
+        this.isShowPayDialog = false
+        this.isShowCheckOrder = true
+      }, _ => {
+        this.isShowPayDialog = false
+        this.isShowErrDialog = true
       })
     }
   },

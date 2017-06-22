@@ -53,6 +53,7 @@ export default {
 .selecton-components{
   position: relative;
   display: inline-block;
+  background: #fff;
 }
 .selecton-show{
   position: relative;

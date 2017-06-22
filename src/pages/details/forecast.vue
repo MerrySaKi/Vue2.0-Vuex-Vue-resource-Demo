@@ -9,7 +9,7 @@
           购买数量:
         </div>
         <div class="sale-board-from-line-right">
-          <v-counter :max=99 @on-change = "onParamChange('getNum', $event)"></v-counter>
+          <v-counter :max=99 @on-change = "onParamChange('buyNum', $event)"></v-counter>
         </div>
       </div>
       <div class="sale-board-from-line">
@@ -33,14 +33,14 @@
           总价:
         </div>
         <div class="sale-board-from-line-right">
-          {{price * getNum}}元
+          {{price * buyNum}}元
         </div>
       </div>
       <div class="sale-board-from-line">
         <div class="sale-board-from-line-left">
         &nbsp;</div>
         <div class="sale-board-from-line-right">
-          <div class="sale-board-from-button">立即购买</div>
+          <div class="sale-board-from-button" @click="showPayDialog">立即购买</div>
         </div>
       </div>
     </div>
@@ -52,6 +52,30 @@
 作为预测分析领域的专家，埃里克·西格尔博士深谙预测分析界已经实现和正在发生的事情、面临的问题和将来可能的前景。在《大数据预测》一书中，他结合预测分析的应用实例，对其进行了深入、细致且全面的解读。
 关于预测分析，你想了解的全部，你的生活以及这个世界会因为预测分析改变到什么程度，《大数据预测》都会告诉你。</p>
     </div>
+      <bank-dialog :is-show="isShowPayDialog">
+       <div class="">
+        <table class="buy-dialog-list">
+          <tr>
+            <th>购买数量</th>
+            <th>时间</th>
+            <th>产品版本</th>
+          </tr>
+          <tr>
+            <td>{{buyNum}}</td>
+            <td>半年</td>
+            <td>
+              <span v-for="item in versions">{{ item.label }}； </span>
+            </td>
+          </tr>
+        </table>
+        <h2>请选择银行</h2>
+        <bank-chooser @on-change="onChangeBanks"></bank-chooser>
+        <div class="buy-dialog-btn" @click="confirmBuy">确认购买</div>
+      </div>
+    </bank-dialog>
+    <bank-dialog :is-show="isShowErrDialog">
+    支付失败！</bank-dialog>
+     <check-order :is-show-check-dialog="isShowCheckDialog" @on-close-check-dialog = "hideCheckDialog"></check-order>
   </div>
 </template>
 
@@ -59,17 +83,28 @@
 import vSelection from '../../components/base/selection'
 import vMulChooser from '../../components/base/mulchooser'
 import vCounter from '../../components/base/counter'
+import checkOrder from '../../components/checkorder'
+import bankChooser from '../../components/bankchoose'
+import bankDialog from '../../components/base/dialog'
+
 export default {
   components: {
     vSelection,
     vMulChooser,
-    vCounter
+    vCounter,
+    bankChooser,
+    bankDialog,
+    checkOrder
   },
   data () {
     return {
-      getNum: 1,
+      isShowErrDialog: false,
+      isShowCheckDialog: false,
+      isShowPayDialog: false,
+      buyNum: 1,
       versions: [],
       price: 0,
+      bankId: null,
       versionList: [
         {
           label: '纸质报告',
@@ -102,16 +137,47 @@ export default {
       })
       let regParam = {
         version: nowVersionArray.join(','),
-        buyNumber: this.getNum
+        buyNumber: this.buyNum
       }
       this.$http.get('/api/getPrice', regParam)
       .then((res) => {
         this.price = res.data.amount
       })
+    },
+    showPayDialog () {
+      this.isShowPayDialog = true
+    },
+    showErrDialog () {
+      this.isShowErrDialog = true
+    },
+    hideCheckDialog () {
+      this.isShowCheckDialog = false
+    },
+    onChangeBanks (bank) {
+      this.bankId = bank.id
+    },
+    confirmBuy () {
+      let nowArray = []
+      this.versions.map((item) => {
+        nowArray.push(item.label)
+      })
+      let reqParam = {
+        buyNum: this.buyNum,
+        version: nowArray.join(','),
+        bankId: this.bankId
+      }
+      this.$http.get('/api/createOrder', reqParam)
+      .then(() => {
+        this.isShowPayDialog = false
+        this.isShowCheckDialog = true
+      }, _ => {
+        this.isShowPayDialog = false
+        this.isShowErrDialog = true
+      })
     }
   },
   mounted () {
-    this.getNum = 1
+    this.buyNum = 1
     this.versions = [this.versionList[0]]
     this.getPrice()
   }

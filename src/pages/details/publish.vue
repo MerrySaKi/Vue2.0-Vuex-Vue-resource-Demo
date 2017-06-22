@@ -49,7 +49,7 @@
         <div class="sale-board-from-line-left">
           &nbsp;</div>
         <div class="sale-board-from-line-right">
-          <div class="sale-board-from-button">立即购买</div>
+          <div class="sale-board-from-button" @click="showPayDialog">立即购买</div>
         </div>
       </div>
     </div>
@@ -246,6 +246,30 @@
           </tbody>
       </table>
     </div>
+    <bank-dialog :is-show="isShowPayDialog">
+       <div class="">
+        <table class="buy-dialog-list">
+          <tr>
+            <th>购买数量</th>
+            <th>产品类型</th>
+            <th>产品版本</th>
+          </tr>
+          <tr>
+            <td>{{buyNum}}</td>
+            <td>{{buyType.label}}</td>
+            <td>
+              <span v-for="item in versions">{{ item.label }}； </span>
+            </td>
+          </tr>
+        </table>
+        <h2>请选择银行</h2>
+        <bank-chooser @on-change="onChangeBanks"></bank-chooser>
+        <div class="buy-dialog-btn" @click="confirmBuy">确认购买</div>
+      </div>
+    </bank-dialog>
+    <bank-dialog :is-show="isShowErrDialog">
+    支付失败！</bank-dialog>
+    <check-order :is-show-check-dialog="isShowCheckDialog" @on-close-check-dialog = "hideCheckDialog"></check-order>
   </div>
 </template>
 
@@ -253,19 +277,29 @@
 import vSelection from '../../components/base/selection'
 import vMulChooser from '../../components/base/mulchooser'
 import vCounter from '../../components/base/counter'
+import checkOrder from '../../components/checkorder'
+import bankChooser from '../../components/bankchoose'
+import bankDialog from '../../components/base/dialog'
 
 export default {
   components: {
     vSelection,
     vMulChooser,
-    vCounter
+    vCounter,
+    bankChooser,
+    bankDialog,
+    checkOrder
   },
   data () {
     return {
+      isShowErrDialog: false,
+      isShowCheckDialog: false,
+      isShowPayDialog: false,
       buyNum: 1,
       buyType: {},
       versions: [],
       price: 0,
+      bankId: null,
       tradeList: [
         {
           label: '出版业',
@@ -326,6 +360,38 @@ export default {
       this.$http.get('/api/getPrice', regParam)
       .then((res) => {
         this.price = res.data.amount
+      })
+    },
+    showPayDialog () {
+      this.isShowPayDialog = true
+    },
+    showErrDialog () {
+      this.isShowErrDialog = true
+    },
+    hideCheckDialog () {
+      this.isShowCheckDialog = false
+    },
+    onChangeBanks (bank) {
+      this.bankId = bank.id
+    },
+    confirmBuy () {
+      let nowArray = []
+      this.versions.map((item) => {
+        nowArray.push(item.label)
+      })
+      let reqParam = {
+        buyNum: this.buyNum,
+        buyType: this.buyType.value,
+        version: nowArray.join(','),
+        bankId: this.bankId
+      }
+      this.$http.get('/api/createOrder', reqParam)
+      .then(() => {
+        this.isShowPayDialog = false
+        this.isShowCheckDialog = true
+      }, _ => {
+        this.isShowPayDialog = false
+        this.isShowErrDialog = true
       })
     }
   },
