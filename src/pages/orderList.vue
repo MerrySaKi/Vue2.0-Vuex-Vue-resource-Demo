@@ -24,7 +24,7 @@
         <tr>
           <th v-for="item in tableHeads">{{item.label}}</th>
         </tr>
-        <tr v-for="orderItems in orderList">
+        <tr v-for="orderItems in tableData">
           <td v-for="item in tableHeads">{{orderItems[item.key]}}
           </td>
         </tr>
@@ -47,7 +47,6 @@ export default {
       inlineBlock: 'inlineBlock',
       startDate: '',
       endDate: '',
-      orderList: [],
       format: 'D dsu MMM yyyy',
       products: [
         {
@@ -106,18 +105,38 @@ export default {
       this.getTableData()
     }
   },
+  computed: {
+    tableData () {
+      return this.$store.getters.getOrderList
+    }
+  },
   methods: {
     productChange (id) {
-      this.productId = id.value
-      this.getTableData()
+      // this.productId = id.value
+      // this.getTableData()
+      this.$store.commit('updataParams', {
+        key: 'productId',
+        val: id.value
+      })
+      this.$store.dispatch('fetchOrderList')
     },
     changestartDate (data) {
-      this.startDate = data
-      this.getTableData()
+      this.$store.commit('updataParams', {
+        key: 'startDate',
+        val: data
+      })
+      this.$store.dispatch('fetchOrderList')
+      // this.startDate = data
+      // this.getTableData()
     },
     changeendDate (data) {
-      this.endDate = data
-      this.getTableData()
+      this.$store.commit('updataParams', {
+        key: 'endData',
+        val: data
+      })
+      this.$store.dispatch('fetchOrderList')
+      // this.endDate = data
+      // this.getTableData()
     },
     getTableData () {
       let reqParams = {
@@ -128,14 +147,15 @@ export default {
       }
       this.$http.get('/api/getOrderList', reqParams)
       .then((res) => {
-        this.orderList = res.data.list
+        this.tableData = res.data.list
       }, _ => {
         console.log('err')
       })
     }
   },
   mounted () {
-    this.getTableData()
+    // this.getTableData()
+    this.$store.dispatch('fetchOrderList')
   }
 }
 </script>
